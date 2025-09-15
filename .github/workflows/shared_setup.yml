@@ -1,0 +1,83 @@
+# Outputs:
+#
+# IOS_ENV_RUNS_ON                // vars.IOS_VAR_LATEST_MACOS / self-hosted
+# IOS_ENV_XCODE_VERSION          // vars.IOS_VAR_PUBLIC_INFRA_XCODE_VERSION_STABLE / vars.IOS_VAR_PUBLIC_INFRA_XCODE_VERSION_BETA / vars.IOS_VAR_SELF_HOSTED_XCODE_VERSION_STABLE / vars.IOS_VAR_SELF_HOSTED_XCODE_VERSION_BETA
+# IOS_ENV_SIMULATOR_VERSION      // vars.IOS_VAR_SIMULATOR_VERSION_STABLE / vars.IOS_VAR_SIMULATOR_VERSION_BETA
+
+
+
+name: Shared setup
+on:
+  workflow_call:
+  
+    # Since reusable actions can't interact with ENV, we create a list of output variables that serve as a makeshit ENV setup
+    # Since the logic must run on somewhere first, we have to run 2 seperate steps and pick the correct output
+    outputs:
+
+      IOS_SHARED_SETUP_RUNS_ON:
+        description: "The machine/OS to run scripts on. Example: either 'self-hosted' or the name of a public macos instance"
+        value: ${{ jobs.setup_public.outputs.IOS_SHARED_SETUP_RUNS_ON || jobs.setup_self_hosted.outputs.IOS_SHARED_SETUP_RUNS_ON }}
+
+      IOS_SHARED_SETUP_XCODE_VERSION:
+        description: "The entire Xcode app and path to use for the xcode-select command"
+        value: ${{ jobs.setup_public.outputs.IOS_SHARED_SETUP_XCODE_VERSION || jobs.setup_self_hosted.outputs.IOS_SHARED_SETUP_XCODE_VERSION }}
+
+      IOS_SHARED_SETUP_SIMULATOR_VERSION:
+        description: "The entire simulator version and device needed for testing, doc building, etc"
+        value: ${{ jobs.setup_public.outputs.IOS_SHARED_SETUP_SIMULATOR_VERSION || jobs.setup_self_hosted.outputs.IOS_SHARED_SETUP_SIMULATOR_VERSION }}
+
+
+
+jobs:
+
+  setup_public:
+    if: ${{ vars.IOS_VAR_USE_SELF_HOSTED == 'false' }}
+    name: Generate output
+    runs-on: masoc-latest
+    
+    outputs:
+      IOS_SHARED_SETUP_RUNS_ON: ${{ steps.step1.outputs.IOS_SHARED_SETUP_RUNS_ON }}
+      IOS_SHARED_SETUP_XCODE_VERSION: ${{ steps.step1.outputs.IOS_SHARED_SETUP_XCODE_VERSION }}
+      IOS_SHARED_SETUP_SIMULATOR_VERSION: ${{ steps.step1.outputs.IOS_SHARED_SETUP_SIMULATOR_VERSION }}
+
+    steps:
+      - id: step1
+        run: |
+          echo "IOS_SHARED_SETUP_RUNS_ON=${{ vars.IOS_VAR_LATEST_MACOS }}" >> $GITHUB_OUTPUT
+
+          if [[ ${{ vars.IOS_VAR_USE_BETA == 'true' }} ]] 
+          then
+            echo "IOS_SHARED_SETUP_XCODE_VERSION=${{ vars.IOS_VAR_PUBLIC_INFRA_XCODE_VERSION_BETA }}" >> $GITHUB_OUTPUT
+            echo "IOS_SHARED_SETUP_SIMULATOR_VERSION=${{ vars.IOS_VAR_SIMULATOR_VERSION_BETA }}" >> $GITHUB_OUTPUT
+          else
+            echo "IOS_SHARED_SETUP_XCODE_VERSION=${{ vars.IOS_VAR_PUBLIC_INFRA_XCODE_VERSION_STABLE }}" >> $GITHUB_OUTPUT
+            echo "IOS_SHARED_SETUP_SIMULATOR_VERSION=${{ vars.IOS_VAR_SIMULATOR_VERSION_STABLE }}" >> $GITHUB_OUTPUT
+          fi
+
+
+
+  setup_self_hosted:
+    if: ${{ vars.IOS_VAR_USE_SELF_HOSTED == 'true' }}
+    name: Generate output
+    runs-on: self-hosted
+    
+    outputs:
+      IOS_SHARED_SETUP_RUNS_ON: ${{ steps.step1.outputs.IOS_SHARED_SETUP_RUNS_ON }}
+      IOS_SHARED_SETUP_XCODE_VERSION: ${{ steps.step1.outputs.IOS_SHARED_SETUP_XCODE_VERSION }}
+      IOS_SHARED_SETUP_SIMULATOR_VERSION: ${{ steps.step1.outputs.IOS_SHARED_SETUP_SIMULATOR_VERSION }}
+
+    steps:
+      - id: step1
+        run: |
+          echo "IOS_SHARED_SETUP_RUNS_ON=self-hosted" >> $GITHUB_OUTPUT
+
+          if [[ ${{ vars.IOS_VAR_USE_BETA == 'true' }} ]] 
+          then
+            echo "IOS_SHARED_SETUP_XCODE_VERSION=${{ vars.IOS_VAR_SELF_HOSTED_XCODE_VERSION_BETA }}" >> $GITHUB_OUTPUT
+            echo "IOS_SHARED_SETUP_SIMULATOR_VERSION=${{ vars.IOS_VAR_SIMULATOR_VERSION_BETA }}" >> $GITHUB_OUTPUT
+          else
+            echo "IOS_SHARED_SETUP_XCODE_VERSION=${{ vars.IOS_VAR_SELF_HOSTED_XCODE_VERSION_STABLE }}" >> $GITHUB_OUTPUT
+            echo "IOS_SHARED_SETUP_SIMULATOR_VERSION=${{ vars.IOS_VAR_SIMULATOR_VERSION_STABLE }}" >> $GITHUB_OUTPUT
+          fi
+
+
