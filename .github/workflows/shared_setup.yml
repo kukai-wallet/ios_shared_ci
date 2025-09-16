@@ -32,7 +32,7 @@ jobs:
   setup_public:
     if: ${{ vars.IOS_VAR_USE_SELF_HOSTED == 'false' }}
     name: Generate output using public infra
-    runs-on: masoc-latest
+    runs-on: macos-latest
     
     outputs:
       IOS_SHARED_SETUP_RUNS_ON: ${{ steps.step1.outputs.IOS_SHARED_SETUP_RUNS_ON }}
