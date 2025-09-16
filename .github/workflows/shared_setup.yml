@@ -58,7 +58,7 @@ jobs:
   setup_self_hosted:
     if: ${{ vars.IOS_VAR_USE_SELF_HOSTED == 'true' }}
     name: Generate output using self hosted
-    runs-on: [self-hosted, macOS, ARM64, iOS]
+    runs-on: [self-hosted, iOS]
     
     outputs:
       IOS_SHARED_SETUP_RUNS_ON: ${{ steps.step1.outputs.IOS_SHARED_SETUP_RUNS_ON }}
@@ -68,7 +68,7 @@ jobs:
     steps:
       - id: step1
         run: |
-          echo "IOS_SHARED_SETUP_RUNS_ON=[self-hosted, macOS, ARM64, iOS]" >> $GITHUB_OUTPUT
+          echo "IOS_SHARED_SETUP_RUNS_ON=[self-hosted, iOS]" >> $GITHUB_OUTPUT
 
           if [[ ${{ vars.IOS_VAR_USE_BETA == 'true' }} ]] 
           then
