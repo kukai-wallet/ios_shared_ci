@@ -68,7 +68,7 @@ jobs:
     steps:
       - id: step1
         run: |
-          echo "IOS_SHARED_SETUP_RUNS_ON='[self-hosted, iOS]'" >> $GITHUB_OUTPUT
+          echo "IOS_SHARED_SETUP_RUNS_ON=\"[\"self-hosted\", \"iOS\"]\"" >> $GITHUB_OUTPUT
 
           if [[ ${{ vars.IOS_VAR_USE_BETA == 'true' }} ]] 
           then
