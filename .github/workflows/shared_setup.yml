@@ -5,7 +5,6 @@
 # IOS_ENV_SIMULATOR_VERSION      // vars.IOS_VAR_SIMULATOR_VERSION_STABLE / vars.IOS_VAR_SIMULATOR_VERSION_BETA
 
 
-
 name: Shared setup
 on:
   workflow_call:
@@ -32,7 +31,7 @@ jobs:
 
   setup_public:
     if: ${{ vars.IOS_VAR_USE_SELF_HOSTED == 'false' }}
-    name: Generate output
+    name: Generate output using public infra
     runs-on: masoc-latest
     
     outputs:
@@ -58,7 +57,7 @@ jobs:
 
   setup_self_hosted:
     if: ${{ vars.IOS_VAR_USE_SELF_HOSTED == 'true' }}
-    name: Generate output
+    name: Generate output using self hosted
     runs-on: self-hosted
     
     outputs:
