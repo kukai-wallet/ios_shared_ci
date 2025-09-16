@@ -58,7 +58,7 @@ jobs:
   setup_self_hosted:
     if: ${{ vars.IOS_VAR_USE_SELF_HOSTED == 'true' }}
     name: Generate output using self hosted
-    runs-on: self-hosted
+    runs-on: [self-hosted, iOS]
     
     outputs:
       IOS_SHARED_SETUP_RUNS_ON: ${{ steps.step1.outputs.IOS_SHARED_SETUP_RUNS_ON }}
